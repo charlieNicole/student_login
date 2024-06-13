@@ -1,0 +1,846 @@
+//Ceaser-
+#include<stdio.h>
+
+#include<ctype.h>
+
+int main() {
+
+    char text[500], ch;
+
+    int key;
+
+    // Taking user input.
+    printf("Enter a message to encrypt: ");
+
+    scanf("%[^\n]s", text);
+
+    printf("Enter the key: ");
+
+    scanf("%d", & key);
+
+    // Visiting character by character.
+
+    for (int i = 0; text[i] != '\0'; ++i) {
+
+        ch = text[i];
+        // Check for valid characters.
+        if (isalpha(ch)) {
+
+            //Lowercase characters.
+            if (islower(ch)) {
+                ch = (ch - 'a' + key) % 26 + 'a';
+            }
+            // Uppercase characters.
+            else {
+                ch = (ch - 'A' + key) % 26 + 'A';
+            }
+
+        }
+        // Invalid character.
+        else {
+            printf("Invalid Message");
+        }
+
+        // Adding encoded answer.
+        text[i] = ch;
+
+    }
+
+    printf("Encrypted message: %s", text);
+    
+    for (int i = 0; text[i] != '\0'; ++i) {
+
+        ch = text[i];
+        // Check for valid characters.
+        if (isalpha(ch)) {
+
+            //Lowercase characters.
+            if (islower(ch)) {
+                ch = (ch - 'a' -key+26) % 26 + 'a';
+            }
+            // Uppercase characters.
+            else {
+                ch = (ch - 'A' - key+26) % 26 + 'A';
+            }
+
+        }
+
+        text[i] = ch;
+
+    }
+
+    printf("\nDencrypted message: %s", text);
+
+    return 0;
+}
+/////////////////////////////////////////////////////////////
+#hillchiper-
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cmath>
+
+using namespace std;
+
+// Function to calculate the determinant of a 2x2 matrix
+int determinant(int a, int b, int c, int d) {
+    return a * d - b * c;
+}
+
+// Function to calculate the modular multiplicative inverse
+int modInverse(int a, int m) {
+    a = a % m;
+    for (int x = 1; x < m; x++)
+        if ((a * x) % m == 1)
+            return x;
+    return -1;
+}
+
+// Function to encrypt plaintext using Hill cipher
+string encrypt(string plaintext, vector<vector< int > > key) {
+    int n = key.size();
+    string ciphertext = "";
+
+    // Padding plaintext if necessary
+    if (plaintext.size() % n != 0)
+        plaintext += string(n - (plaintext.size() % n), 'x');
+
+    for (int i = 0; i < plaintext.size(); i += n) {
+        vector<int> block(n);
+        for (int j = 0; j < n; j++)
+            block[j] = plaintext[i + j] - 'a';
+
+        for (int j = 0; j < n; j++) {
+            int sum = 0;
+            for (int k = 0; k < n; k++)
+                sum += key[j][k] * block[k];
+            ciphertext += (char)((sum % 26) + 'a');
+        }
+    }
+
+    return ciphertext;
+}
+
+// Function to decrypt ciphertext using Hill cipher
+string decrypt(string ciphertext, vector<vector < int > > key) {
+    int n = key.size();
+    string plaintext = "";
+    int det = determinant(key[0][0], key[0][1], key[1][0], key[1][1]);
+    int detInv = modInverse(det, 26);
+    if (detInv == -1) {
+        cout << "Determinant has no modular inverse, cannot decrypt." << endl;
+        return "";
+    }
+
+    int adj11 = key[1][1];
+    int adj12 = -key[0][1];
+    int adj21 = -key[1][0];
+    int adj22 = key[0][0];
+
+    // Finding adjugate of the key matrix
+    adj11 = (adj11 % 26 + 26) % 26;
+    adj12 = (adj12 % 26 + 26) % 26;
+    adj21 = (adj21 % 26 + 26) % 26;
+    adj22 = (adj22 % 26 + 26) % 26;
+
+    vector<vector < int > > inverseKey(2, vector<int>(2));
+inverseKey[0][0] = adj11;
+inverseKey[0][1] = adj12;
+inverseKey[1][0] = adj21;
+inverseKey[1][1] = adj22;
+
+    
+
+    for (int i = 0; i < ciphertext.size(); i += n) {
+        vector<int> block(n);
+        for (int j = 0; j < n; j++)
+            block[j] = ciphertext[i + j] - 'a';
+
+        for (int j = 0; j < n; j++) {
+            int sum = 0;
+            for (int k = 0; k < n; k++)
+                sum += inverseKey[j][k] * block[k];
+            plaintext += (char)(((sum * detInv) % 26 + 26) % 26 + 'a');
+        }
+    }
+
+    return plaintext;
+}
+
+int main() {
+    string plaintext;
+    cout<<"Enter plaintext: ";
+    cin>>plaintext;
+    vector<vector < int > > key(2,vector<int>(2));
+    cout<<"enter the 2x2 key matrix "<<endl;
+    for(int i=0;i<2;i++){
+    	for(int j=0;j<2;j++){
+    		cin>>key[i][j];
+		}
+	}
+
+    string ciphertext = encrypt(plaintext, key);
+    cout << "Encrypted text: " << ciphertext << endl;
+
+    string decryptedtext = decrypt(ciphertext, key);
+    cout << "Decrypted text: " << decryptedtext << endl;
+
+    return 0;
+}
+///////////////////////////////////////////////////////////////////////
+#rsa-
+#include<bits/stdc++.h>
+using namespace std;
+
+int gcd(int a, int h) {
+    int temp;
+    while (1) {
+        temp = a % h;
+        if (temp == 0) {
+            return h;
+        }
+        a = h;
+        h = temp;
+    }
+}
+
+int main() {
+    double p, q, msg;
+
+    // Taking input from the user
+    cout << "Enter the value of p: ";
+    cin >> p;
+    cout << "Enter the value of q: ";
+    cin >> q;
+    cout << "Enter the message data: ";
+    cin >> msg;
+
+    double n = p * q;
+    double e = 2;
+    double phi = (p - 1) * (q - 1);
+    
+    while (e < phi) {
+        if (gcd(e, phi) == 1) {
+            break;
+        } else {
+            e++;
+        }
+    }
+
+    double d1 = 1 / e;
+    double d = fmod(d1, phi);
+
+    printf("message data: %lf\n", msg);
+    double c = pow(msg, e);
+    double m = pow(c, d);
+    c = fmod(c, n);
+    printf("encrypted data: %lf\n", c);
+
+    m = fmod(m, n);
+    printf("original data: %lf\n", m);
+
+    return 0;
+}
+//////////////////////////////////////////////////////////////////////
+#playfair
+#include <stdio.h>
+#include <string.h>
+
+void toLowerCase(char plain[], int ps)
+{
+	int i;
+	for (i = 0; i < ps; i++) {
+		if (plain[i] > 64 && plain[i] < 91)
+			plain[i] += 32;
+	}
+}
+int removeSpaces(char* plain, int ps) {
+    int count = 0;
+    int i;
+    for (i = 0; i < ps; i++)
+		if (plain[i] != ' ')
+            plain[count++] = plain[i];
+    plain[count] = '\0';
+    return count;
+}
+
+void generateKeyTable(char key[], int ks, char keyT[5][5]) {
+    int dicty[26] = {0};
+    int i,j,k;
+    for (i = 0; i < ks; i++)
+        if (key[i] != 'j')
+            dicty[key[i] - 97] = 2;
+    dicty['j' - 97] = 1;
+    i = 0, j = 0;
+    for (k = 0; k < ks; k++) {
+        if (dicty[key[k] - 97] == 2) {
+            dicty[key[k] - 97] -= 1;
+            keyT[i][j] = key[k];
+            j++;
+            if (j == 5) { i++; j = 0; }
+        }
+    }
+    for (k = 0; k < 26; k++) {
+        if (dicty[k] == 0) {
+            keyT[i][j] = (char)(k + 97);
+            j++;
+            if (j == 5) { i++; j = 0; }
+        }
+    }
+}
+
+void search(char keyT[5][5], char a, char b, int arr[]) {
+int i,j;
+    for (i = 0; i < 5; i++)
+        for (j = 0; j < 5; j++)
+            if (keyT[i][j] == a) {
+                arr[0] = i;
+                arr[1] = j;
+            } else if (keyT[i][j] == b) {
+                arr[2] = i;
+                arr[3] = j;
+            }
+}
+
+int mod5(int a) 
+{ return (a % 5);
+}
+
+int prepare(char str[], int ptrs) {
+    int count1 = 0,i;
+    char p1[100];
+    for (i = 0; i < ptrs; i++) {
+        p1[count1] = str[i];
+        if (str[i] == str[i + 1]) {
+            count1++;
+            p1[count1] = (str[i] == 'x') ? 'z' : 'x';
+        }
+        count1++;
+    }
+    strcpy(str, p1);
+    if (count1 % 2 != 0) { str[count1++] = 'z'; str[count1] = '\0'; }
+    return count1;
+}
+
+void encrypt(char str[], char keyT[5][5], int ps) {
+	int i;
+    for (i = 0; i < ps; i += 2) {
+        int a[4];
+        search(keyT, str[i], str[i + 1], a);
+        if (a[0] == a[2]) {
+            str[i] = keyT[a[0]][mod5(a[1] + 1)];
+            str[i + 1] = keyT[a[0]][mod5(a[3] + 1)];
+        } else if (a[1] == a[3]) {
+            str[i] = keyT[mod5(a[0] + 1)][a[1]];
+            str[i + 1] = keyT[mod5(a[2] + 1)][a[1]];
+        } else {
+            str[i] = keyT[a[0]][a[3]];
+            str[i + 1] = keyT[a[2]][a[1]];
+        }
+    }
+}
+
+void decrypt(char str[], char keyT[5][5], int ps) {
+	int i;
+    for (i = 0; i < ps; i += 2) {
+        int a[4];
+        search(keyT, str[i], str[i + 1], a);
+        if (a[0] == a[2]) {
+            str[i] = keyT[a[0]][(a[1] + 4) % 5];
+            str[i + 1] = keyT[a[0]][(a[3] + 4) % 5];
+        } else if (a[1] == a[3]) {
+            str[i] = keyT[(a[0] + 4) % 5][a[1]];
+            str[i + 1] = keyT[(a[2] + 4) % 5][a[1]];
+        } else {
+            str[i] = keyT[a[0]][a[3]];
+            str[i + 1] = keyT[a[2]][a[1]];
+        }
+    }
+}
+
+void encryptByPlayfairCipher(char str[], char key[]) {
+    int ps = strlen(str), ks = strlen(key);
+    ks = removeSpaces(key, ks);
+    toLowerCase(str, ks);
+    ps = removeSpaces(str, ps);
+    ps = prepare(str, ps);
+    char keyT[5][5];
+    generateKeyTable(key, ks, keyT);
+    encrypt(str, keyT, ps);
+}
+
+void decryptByPlayfairCipher(char str[], char key[]) {
+    int ps = strlen(str), ks = strlen(key);
+    ks = removeSpaces(key, ks);
+    toLowerCase(str, ks);
+    ps = removeSpaces(str, ps);
+    char keyT[5][5];
+    generateKeyTable(key, ks, keyT);
+    decrypt(str, keyT, ps);
+}
+
+int main() {
+    char str[200], key[200];
+    printf("Enter key: ");
+    scanf("%[^\n]s", &key);
+    printf("Enter plaintext: ");
+    scanf("\n");
+    scanf("%[^\n]s", &str);
+    encryptByPlayfairCipher(str, key);
+    printf("Cipher text: %s\n", str);
+    decryptByPlayfairCipher(str, key);
+    printf("plain text: %s\n", str);
+    return 0;
+}
+///////////////////////////////////////////////////////////////////
+#des-
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+
+public class DESExample {
+
+    public static void main(String[] args) throws Exception {
+        String plainText = "Hello world.";
+        System.out.println("Original Text: " + plainText);
+
+        // Generate DES key
+        SecretKey secretKey = generateKey();
+
+        // Encrypt the text
+        String encryptedText = encrypt(plainText, secretKey);
+        System.out.println("Encrypted Text: " + encryptedText);
+
+        // Decrypt the text
+        String decryptedText = decrypt(encryptedText, secretKey);
+        System.out.println("Decrypted Text: " + decryptedText);
+    }
+
+    // Generate a DES key
+    public static SecretKey generateKey() throws Exception {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("DES");
+        return keyGenerator.generateKey();
+    }
+
+    // Encrypt using DES
+    public static String encrypt(String plainText, SecretKey secretKey) throws Exception {
+        Cipher cipher = Cipher.getInstance("DES");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        byte[] encryptedBytes = cipher.doFinal(plainText.getBytes());
+        return Base64.getEncoder().encodeToString(encryptedBytes);
+    }
+
+    // Decrypt using DES
+    public static String decrypt(String encryptedText, SecretKey secretKey) throws Exception {
+        Cipher cipher = Cipher.getInstance("DES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+        byte[] encryptedBytes = Base64.getDecoder().decode(encryptedText);
+        byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+        return new String(decryptedBytes);
+    }
+}
+follow this code for des the first sent code is producing anonymous output
+//////////////////////////////////////////////////
+SHA-
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class SHA{
+    public static void main(String[] args) throws NoSuchAlgorithmException {
+        String input = "Hello, World!";
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        byte[] hash = md.digest(input.getBytes());
+
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hash) hexString.append(String.format("%02x", b));
+
+        System.out.println("SHA-1 Hash: " + hexString.toString());
+    }
+}
+///////////////////////////////////////////////////////
+DSA or-
+import java.io.*;
+import java.util.*;
+class Main{
+    public static int s0[][] = { {1, 0, 3, 2},
+                                {3, 2, 1, 0},
+                                {0, 2, 1, 3},
+                                {3, 1, 3, 2} };
+    public static int s1[][] = { {0, 1, 2, 3},
+                                {2, 0, 1, 3},
+                                {3, 0, 1, 0},
+                                {2, 1, 0, 3} };
+    public static void LS(int[] p10, int n){
+        for(int x = 0; x<n; x++){
+            int k = p10[0];
+            for(int i = 0; i<4; i++)
+                p10[i] = p10[i+1];
+            p10[4] = k; k = p10[5];
+            for(int i = 5; i<9; i++)
+                p10[i] = p10[i+1];
+            p10[9] = k;
+        }
+    }
+    public static void p8Permutation(int key[], int p10[]){
+        key[0] = p10[5]; key[1] = p10[2]; key[2] = p10[6]; key[3] = p10[3];
+        key[4] = p10[7]; key[5] = p10[4]; key[6] = p10[9]; key[7] = p10[8];
+    }
+    public static void p10Permutation(int key[], int p10[]){
+        p10[0] = key[2]; p10[1] = key[4]; p10[2] = key[1]; p10[3] = key[6]; p10[4] = key[3];
+        p10[5] = key[9]; p10[6] = key[0]; p10[7] = key[8]; p10[8] = key[7]; p10[9] = key[5];
+    }
+    public static void IP(int[] ip, int[] plain){
+        ip[0] = plain[1]; ip[1] = plain[5]; ip[2] = plain[2]; ip[3] = plain[0];
+        ip[4] = plain[3]; ip[5] = plain[7]; ip[6] = plain[4]; ip[7] = plain[6];
+    }
+    public static void EP(int ep[], int ip[]){
+        ep[0] = ip[7]; ep[1] = ip[4]; ep[2] = ip[5]; ep[3] = ip[6];
+        ep[4] = ip[5]; ep[5] = ip[6]; ep[6] = ip[7]; ep[7] = ip[4];
+    }
+    public static void p4Permutation(int p4[], int val[]){
+        p4[0] = val[1]; p4[1] = val[3]; p4[2] = val[2]; p4[3] = val[0];
+    }
+    public static void func(int arr[], int key[]){
+        int ep[] = new int[8];
+        EP(ep, arr);
+        for(int i = 0; i<8; i++)
+            ep[i]^=key[i];
+        int valS0 = s0[(ep[0]*2)+ep[3]][(ep[1]*2)+ep[2]], valS1 = s1[(ep[4]*2)+ep[7]][(ep[5]*2)+ep[6]];
+        int val[] = new int[4];
+        val[1] = valS0%2; val[0] = (valS0/2)%2;
+        val[3] = valS1%2; val[2] = (valS1/2)%2;
+        int p4[] = new int[4];
+        p4Permutation(p4, val);
+        for(int i = 0; i<4; i++)
+            p4[i]^=arr[i];
+        for(int i = 0; i<4; i++)
+            arr[i] = p4[i];
+    }
+    public static void swap(int[] arr){
+        for(int i = 0; i<4; i++){
+            int temp = arr[i];
+            arr[i] = arr[i+4];
+            arr[i+4] = temp;
+        }
+    }
+    public static void main(String[] args){
+        Scanner scn = new Scanner(System.in);
+        int plain[] = new int[8], key[] = new int[10], key1[] = new int[8], key2[] = new int[8], cipher[] = new int[8], de[] =  new int[8];
+        System.out.print("Enter the 8-bit plain text : ");
+        for(int i = 0; i<8; i++)
+            plain[i] = scn.nextInt();
+        System.out.print("\nEnter the 10-bit key : ");
+        for(int i = 0; i<10; i++)
+            key[i] = scn.nextInt();
+        int p10[] = new int[10];
+        p10Permutation(key, p10);
+        //For key-1
+        LS(p10, 1);
+        p8Permutation(key1, p10);
+        System.out.print("\nKey-1 is : ");
+        for(int i = 0; i<8; i++)
+            System.out.print(key1[i]+" ");
+        //For key-2
+        LS(p10, 2);
+        p8Permutation(key2, p10);
+        System.out.print("\nKey-2 is : ");
+        for(int i = 0; i<8; i++)
+            System.out.print(key2[i]+" ");
+        int arr[] = new int[8];
+        int ip[] = { 2, 6, 3, 1, 4, 8, 5, 7};
+        for(int i = 0; i<8; i++)
+            arr[i] = plain[ip[i]-1];
+        func(arr, key1);
+        swap(arr);
+        func(arr, key2);
+        cipher[0] = arr[3]; cipher[1] = arr[0]; cipher[2] = arr[2]; cipher[3] = arr[4]; 
+        cipher[4] = arr[6]; cipher[5] = arr[1]; cipher[6] = arr[7]; cipher[7] = arr[5]; 
+        System.out.println("\nThe cipher text is : ");
+        for(int i = 0; i<8; i++)
+            System.out.print(cipher[i]+" ");
+        //DECRYPTION
+        for(int i = 0; i<8; i++)
+            arr[i] = cipher[ip[i]-1];
+        func(arr, key2);
+        swap(arr);
+        func(arr, key1);
+        de[0] = arr[3]; de[1] = arr[0]; de[2] = arr[2]; de[3] = arr[4]; 
+        de[4] = arr[6]; de[5] = arr[1]; de[6] = arr[7]; de[7] = arr[5]; 
+        System.out.println("\nThe decrypted text is : ");
+        for(int i = 0; i<8; i++)
+            System.out.print(de[i]+" ");
+    }
+}
+////////////////////////////////////////////////////////////
+SHA or-
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define LEFTROTATE(x, c) (((x) << (c)) | ((x) >> (32 - (c))))
+
+void sha1(const uint8_t *message, uint32_t len, uint8_t *digest);
+
+int main() {
+    char message[100]; // Assuming maximum message length of 100 characters
+    int i;
+
+    printf("Enter the message: ");
+    scanf("%[^\n]", message); // Read until newline character
+
+    uint8_t digest[20]; // SHA-1 produces a 160-bit (20-byte) digest
+    sha1((uint8_t *)message, strlen(message), digest);
+
+    printf("SHA-1 digest: ");
+    for (i = 0; i < 20; ++i) {
+        printf("%02x", digest[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
+void sha1(const uint8_t *message, uint32_t len, uint8_t *digest) {
+    uint32_t h0, h1, h2, h3, h4;
+    uint32_t a, b, c, d, e, f, k, temp;
+    uint32_t *w = (uint32_t *)malloc(80 * sizeof(uint32_t));
+    int i, j;
+
+    // Initialize variables
+    h0 = 0x67452301;
+    h1 = 0xEFCDAB89;
+    h2 = 0x98BADCFE;
+    h3 = 0x10325476;
+    h4 = 0xC3D2E1F0;
+
+    // Make a copy of the message
+    uint8_t *padded_message = (uint8_t *)malloc((len + 64) * sizeof(uint8_t));
+    memcpy(padded_message, message, len);
+
+    // Pre-processing: Padding
+    uint64_t bit_len = len * 8;
+    // Append a single '1' bit
+    padded_message[len++] = 0x80;
+    // Append '0' bits until message length is congruent to 448 (mod 512)
+    while (len % 64 != 56) {
+        padded_message[len++] = 0;
+    }
+    // Append the bit length of the original message
+    for (i = 0; i < 8; ++i) {
+        padded_message[len++] = (bit_len >> ((7 - i) * 8)) & 0xFF;
+    }
+
+    // Process the padded message in successive 512-bit chunks
+    for (i = 0; i < len; i += 64) {
+        // Break chunk into sixteen 32-bit big-endian words w[i]
+        for (j = 0; j < 16; ++j) {
+            w[j] = (padded_message[i + j * 4] << 24) |
+                   (padded_message[i + j * 4 + 1] << 16) |
+                   (padded_message[i + j * 4 + 2] << 8) |
+                   (padded_message[i + j * 4 + 3]);
+        }
+
+        // Extend the sixteen 32-bit words into eighty 32-bit words
+        for (j = 16; j < 80; ++j) {
+            w[j] = LEFTROTATE((w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16]), 1);
+        }
+
+        // Initialize hash value for this chunk
+        a = h0;
+        b = h1;
+        c = h2;
+        d = h3;
+        e = h4;
+
+        // Main loop
+        for (j = 0; j < 80; ++j) {
+            if (j < 20) {
+                f = (b & c) | ((~b) & d);
+                k = 0x5A827999;
+            } else if (j < 40) {
+                f = b ^ c ^ d;
+                k = 0x6ED9EBA1;
+            } else if (j < 60) {
+                f = (b & c) | (b & d) | (c & d);
+                k = 0x8F1BBCDC;
+            } else {
+                f = b ^ c ^ d;
+                k = 0xCA62C1D6;
+            }
+
+            temp = LEFTROTATE(a, 5) + f + e + k + w[j];
+            e = d;
+            d = c;
+            c = LEFTROTATE(b, 30);
+            b = a;
+            a = temp;
+        }
+
+        // Add this chunk's hash to result so far
+        h0 += a;
+        h1 += b;
+        h2 += c;
+        h3 += d;
+        h4 += e;
+    }
+
+    // Produce the final hash value (big-endian)
+    digest[0] = (h0 >> 24) & 0xFF;
+    digest[1] = (h0 >> 16) & 0xFF;
+    digest[2] = (h0 >> 8) & 0xFF;
+    digest[3] = h0 & 0xFF;
+    digest[4] = (h1 >> 24) & 0xFF;
+    digest[5] = (h1 >> 16) & 0xFF;
+    digest[6] = (h1 >> 8) & 0xFF;
+    digest[7] = h1 & 0xFF;
+    digest[8] = (h2 >> 24) & 0xFF;
+    digest[9] = (h2 >> 16) & 0xFF;
+    digest[10] = (h2 >> 8) & 0xFF;
+    digest[11] = h2 & 0xFF;
+    digest[12] = (h3 >> 24) & 0xFF;
+    digest[13] = (h3 >> 16) & 0xFF;
+    digest[14] = (h3 >> 8) & 0xFF;
+    digest[15] = h3 & 0xFF;
+    digest[16] = (h4 >> 24) & 0xFF;
+    digest[17] = (h4 >> 16) & 0xFF;
+    digest[18] = (h4 >> 8) & 0xFF;
+    digest[19] = h4 & 0xFF;
+
+    free(w);
+    free(padded_message);
+}
+////////////////////////////////////////////////////////////////
+NMAP-
+Scan Results Tabs
+Each scan window contains five tabs which each display different aspects of the scan results. They are: “Nmap Output”, “Ports / Hosts”, “Topology”, “Host Details”, and “Scans”. Each of these are discussed in this section.
+
+The “Nmap Output” tab
+
+The “Nmap Output” tab is displayed by default when a scan is run. It shows the familiar Nmap terminal output. The display highlights parts of the output according to their meaning; for example, open and closed ports are displayed in different colors. Custom highlights can be configured in zenmap.conf (see the section called “Description of zenmap.conf”).
+
+Recall that the results of more than one scan may be shown in a window (see the section called “Scan Aggregation”). The drop-down combo box at the top of the tab allows you to select the scan to display. The “Details” button brings up a window showing miscellaneous information about the scan, such as timestamps, command-line options, and the Nmap version number used.
+
+The “Ports / Hosts” tab
+
+The “Ports / Hosts” tab's display differs depending on whether a host or a service is currently selected. When a host is selected, it shows all the interesting ports on that host, along with version information when available. Host selection is further described in the section called “Sorting by Host”.
+
+
+When a service is selected, the “Ports / Hosts” tab shows all the hosts which have that port open or filtered. This is a good way to quickly answer the question “What computers are running HTTP?” Service selection is further described in the section called “Sorting by Service”.
+
+The “Topology” tab
+
+The “Topology” tab is an interactive view of the connections between hosts in a network. Hosts are arranged in concentric rings. Each ring represents an additional network hop from the center node. Clicking on a node brings it to the center. Because it shows a representation of the network paths between hosts, the “Topology” tab benefits from the use of the --traceroute option. Topology view is discussed in more detail in the section called “Surfing the Network Topology”.
+
+The “Host Details” tab
+
+The “Host Details” tab breaks all the information about a single host into a hierarchical display. Shown are the host's names and addresses, its state (up or down), and the number and status of scanned ports. The host's uptime, operating system, OS icon (see Figure 12.5, “OS icons”), and other associated details are shown when available. When no exact OS match is found, the closest matches are displayed. There is also a collapsible text field for storing a comment about the host which will be saved when the scan is saved to a file (see the section called “Saving and Loading Scan Results”).
+
+Each host has an icon that provides a very rough “vulnerability” estimate, which is based solely on the number of open ports. The icons and the numbers of open ports they correspond to are
+
+  0–2 open ports,
+  3–4 open ports,
+  5–6 open ports,
+  7–8 open ports, and
+  9 or more open ports.
+The “Scans” tab
+
+The “Scans” tab shows all the scans that are aggregated to make up the network inventory. From this tab you can add scans (from a file or directory) and remove scans.
+
+While a scan is executing and not yet complete, its status is “Running”. You may cancel a running scan by clicking the “Cancel Scan” button.
+////////////////////////////////////////////////////////////////
+HONEYPOT-
+KFSensor contains a wealth of both essential and sophisticated security
+features, many of which cannot be found in other products.
+The key design philosophy was to make the product easy and quick to setup
+and use. The interface is totally GUI based, with the pre-configured settings
+making it suitable for most corporate environments, without the need for
+extensive and time-consuming configuration.
+KFSensor Professional monitors attacks on every TCP and UDP port, as well
+as detecting ICMP or ping messages. It also monitors all network activity of
+native Windows server applications; allowing these to act as part of a
+honeypot configuration.
+Remote administration
+The KFSensor Enterprise edition includes the ability to manage and monitor
+multiple honeypot installations. Events from different sensors across the
+network are concatenated in real time, allowing the immediate view of attacks
+as they happen.
+KFSensor uses 3072-bit RSA public/private key authentication and 256-bit AES
+encryption to provide the unrivalled security for communication between
+sensors.
+IDS signature engine
+KFSensor is the first product to combine the benefits of signature-based IDS
+with a honeypot system.
+Its fast signature search engine has minimal impact on system performance
+and can easily handle thousands of rules.
+It is easy to update the rule base with new rules from different sources, and to
+create new rules directly from an event.
+Events
+Sophisticated emulations of services are not sufficient to make a honeypot into
+a useful security tool, as the detailed logging of all attacks is also required.
+KFSensor excels at this logging function.
+Event details
+7
+JNTUH-UCESTH
+All the network traffic that makes up a connection is concatenated into a single
+event, overcoming the problem of message fragmentation. As well as recording
+items such as the start and end time of an attack, a visitor's IP and port
+addresses, all the data transferred both to and from the honeypot is also
+recorded.
+Configurable display columns
+The interactive event list can be configured using any combination of the thirty
+possible column types available.
+View by port
+KFSensor's Explorer type interface includes a port tree structure that colorcodes those ports depending on how recently they have been attacked.
+Selecting a port automatically filters the events to show only those targeted at
+that particular port.
+View by visitor
+The port view can be altered to display a tree of visitors, allowing events to be
+filtered to show events from a particular visitor.
+Severity
+Each event is assigned a severity level. This grading allows more serious attacks
+to be identified, with different actions linked to different severities. For
+example, the system can be configured to specify that an email alert will only
+be sent when a high severity event is detected.
+Reports
+KFSensor comes with a variety of reports that quick and easy to use and yet
+have the flexibility to aid detailed analysis.
+Top Attacks Reports
+There are reports to shows the top ports by number of attacks, the top visitors
+by number of attacks, and the most persistent return visitors.
+Chronological Reports
+Allows for analysis of how attacks change over time.
+Graphs
+Each report is supplemented with a graph, to help visualise the data.
+Custom Filters
+JNTUH-UCESTH
+Reports can be filtered on time period, attack type and the location of the
+visitors, allowing for detailed study and analysis of a particular threat.
+Alerts
+KFSensor employs a number of different mechanisms to alert users when an
+intrusion occurs, these can be individually configured to only activate when a
+specified severity is detected.
+System tray alerts
+KFSensor provides a visual alert, displaying an alarm icon in the system tray at
+the bottom right of the Windows desktop. This flashes either yellow or red
+when an alert is detected.
+Audio alerts
+KFSensor can be configured to play a customizable alert sound when an event
+occurs.
+EMail alerts
+KFSensor can also send alerts via email, using two different formats. The short
+format email alert provides minimal information on an event, and is best suited
+for sending to a portable device; while the long format email alert provides
+much more detailed information and is suitable for a typical email client.
+SysLog alerts
+KFSensor can send alerts to a UNIX Syslog server.
+Event log alerts
+KFSensor can send alerts to the local machine's Event Log, enabling it to be
+detected by third-party event monitoring software.
+External application alerts
+KFSensor provides the ability to invoke an external application to handle an
+alert event. This flexible feature has many different uses, including the creation
+of custom event log files; the launching of an immediate port scan on the IP
+address of a visitor to the honeypot; and can send alerts to a third-party
+application
