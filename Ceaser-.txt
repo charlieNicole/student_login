@@ -889,3 +889,34 @@ alert event. This flexible feature has many different uses, including the creati
 of custom event log files; the launching of an immediate port scan on the IP
 address of a visitor to the honeypot; and can send alerts to a third-party
 application
+//////////////////////////////////////////////////////////////////
+WIRESHARK-
+Wireshark is a free opensource network protocol analyzer. It is used for network troubleshooting and communication
+protocol analysis. Wireshark captures network packets in real time and display them in human-readable format. It
+provides many advanced features including live capture and offline analysis, three-pane packet browser, coloring
+rules for analysis.
+Some intended purposes
+Here are some reasons people use Wireshark:
+ Network administrators use it to troubleshoot network problems
+ Network security engineers use it to examine security problems
+ QA engineers use it to verify network applications
+ Developers use it to debug protocol implementations
+ People use it to learn network protocol internals
+#####
+i. Packet Capture Using Wire shark.
+After downloading and installing Wireshark, you can launch it and click the
+name of an interface under Interface List to start capturing packets on that
+interface. For example, if you want to capture traffic on the wireless network,
+click your wireless interface.
+ii. Starting Wire shark.
+iii. Viewing Captured Traffic.
+iv. Analysis and Statistics & Filters.
+-ip.addr==192.168.1.208:
+-dns or http:
+-tcp.port==80||udp.port==80:
+-tcp.analysis.flags:
+-!(arp or dns or icmp):
+-tcp.stream eq=0
+-Statistics of Source and Destination addresses:
+-http.request:
+-Statistics of Packet Lengths:
