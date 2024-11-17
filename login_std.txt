@@ -41,32 +41,21 @@ for (i in 1:12){
 print(arr2)
 ------------------------------------------------------------------------
 3.
-library(tidyverse)
+view(Titanic)
+sum(is.na(Titanic))
+Titanic = Titanic %>%
+ na.omit()
+dim(Titanic)
+fwd = regsubsets(Freq~., data = Titanic, nvmax = 19, method = "forward")
+bwd = regsubsets(Freq~., data = Titanic, nvmax = 19, method = "backward")
+full = regsubsets(Freq~., data = Titanic, nvmax = 19)
+summary(fwd)
+summary(bwd)
+summary(full)
+coef(fwd, 3)
+coef(bwd, 3)
+coef(full, 3)
 
-library(titanic)
-titanic <- titanic::titanic_train
-
-head(titanic)
-sapply(titanic, class)
-titanic$Sex = as.factor(titanic$Sex)
-titanic$Survived = as.factor(titanic$Survived)
-summary(titanic)
-dropnull_titanic = titanic[rowSums(is.na(titanic)) <= 0, ]
-survivedList = dropnull_titanic[dropnull_titanic$Survived == 1 , ]
-notSurvivedList = dropnull_titanic[dropnull_titanic$Survived == 0, ]
-mytable <- table(titanic$Survived)
-lbls <- paste(names(titanic), "\n", mytable, sep = "")
-pie(
-  mytable, 
-  labels = lbls,
-  main = "pie chart"
-)
-hist(titanic$Age, xlab = "gender", ylab = "frequency")
-barplot(table(notSurvivedList$Sex), xlab = "gender", ylab = "frequency")
-temp <- density(table(survivedList$Fare))
-plot(temp, type = "n", main = "fare charged")
-polygon(temp, col = "lightgray", border = "gray")
-boxplot(titanic$Fare, main = "fare")
 --------------------------------------------------------------------------
 4. Demonstrate outlier detection
 install.packages("tidyr") # For drop_na function
@@ -105,6 +94,10 @@ Data")
 ----------------------------------------------------------------------------
 5. Perform analytics on any standard data set
 library(tidyverse)
+
+library(titanic)
+titanic <- titanic::titanic_train
+
 head(titanic)
 sapply(titanic, class)
 titanic$Sex = as.factor(titanic$Sex)
@@ -116,9 +109,9 @@ notSurvivedList = dropnull_titanic[dropnull_titanic$Survived == 0, ]
 mytable <- table(titanic$Survived)
 lbls <- paste(names(titanic), "\n", mytable, sep = "")
 pie(
- mytable, 
- labels = lbls,
- main = "pie chart"
+  mytable, 
+  labels = lbls,
+  main = "pie chart"
 )
 hist(titanic$Age, xlab = "gender", ylab = "frequency")
 barplot(table(notSurvivedList$Sex), xlab = "gender", ylab = "frequency")
