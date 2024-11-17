@@ -1,3 +1,7 @@
+loading data:
+weatherdata <- read.csv("path/to/weatherdata.csv")  # Replace with the actual file path
+
+------------------------------------------
 1. Demonstrate data cleaning – missing values
 library(tidyverse)
 x <- sample(1:21, 20, replace = TRUE) 
