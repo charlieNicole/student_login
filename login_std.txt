@@ -1,0 +1,263 @@
+1. Demonstrate data cleaning – missing values
+library(tidyverse)
+x <- sample(1:21, 20, replace = TRUE) 
+y <- sample(1:10, 20, replace = TRUE)
+for(i in 1:20)
+{
+ a <- x[i]
+ b <- y[i]
+ mtcars[a, b] = NA
+}
+which(is.na(mtcars))
+sum(is.na(mtcars))
+na.exclude(mtcars)
+view(mtcars)
+dispna <- apply(mtcars["disp"], 2, mean, na.rm=TRUE)
+view(dispna)
+newcars <- mtcars %>%
+ mutate(disp = ifelse(is.na(disp), dispna, disp), )
+view(newcars)
+--------------------------------------------------------------------
+2. Implement data normalization (min-max, z-score)
+arr <- c(9.5, 6.2, 8.9, 15.2, 20.0, 10.1, 5.4, 3.2, 1.0, 22.5, 10.0, 16.0)
+#min-max
+minarr <- min(arr)
+maxarr <- max(arr)
+arr2 <- arr
+for (i in 1:12){
+ arr2[i] = round((arr[i]-minarr)/(maxarr-minarr))
+}
+print(arr2)
+#z-score
+meanarr <- mean(arr)
+sdarr <- sd(arr)
+for (i in 1:12){
+ arr2[i] = round((arr[i]-meanarr)/sdarr, 2)
+}
+print(arr2)
+------------------------------------------------------------------------
+3.
+library(tidyverse)
+
+library(titanic)
+titanic <- titanic::titanic_train
+
+head(titanic)
+sapply(titanic, class)
+titanic$Sex = as.factor(titanic$Sex)
+titanic$Survived = as.factor(titanic$Survived)
+summary(titanic)
+dropnull_titanic = titanic[rowSums(is.na(titanic)) <= 0, ]
+survivedList = dropnull_titanic[dropnull_titanic$Survived == 1 , ]
+notSurvivedList = dropnull_titanic[dropnull_titanic$Survived == 0, ]
+mytable <- table(titanic$Survived)
+lbls <- paste(names(titanic), "\n", mytable, sep = "")
+pie(
+  mytable, 
+  labels = lbls,
+  main = "pie chart"
+)
+hist(titanic$Age, xlab = "gender", ylab = "frequency")
+barplot(table(notSurvivedList$Sex), xlab = "gender", ylab = "frequency")
+temp <- density(table(survivedList$Fare))
+plot(temp, type = "n", main = "fare charged")
+polygon(temp, col = "lightgray", border = "gray")
+boxplot(titanic$Fare, main = "fare")
+--------------------------------------------------------------------------
+4. Demonstrate outlier detection
+install.packages("tidyr") # For drop_na function
+library(tidyr)
+set.seed(123)
+day <- data.frame(
+ temp = rnorm(100, mean = 20, sd = 5), # Random temperatures
+ hum = rnorm(100, mean = 60, sd = 10), # Random humidity percentages
+ windspeed = rnorm(100, mean = 10, sd = 3) # Random wind speeds
+)
+# Add some outliers
+day$temp[c(10, 20, 30)] <- c(40, 45, 50) # Adding extreme temperatures
+day$hum[c(15, 25, 35)] <- c(10, 5, 0) # Adding extreme humidity values
+day$windspeed[c(40, 50, 60)] <- c(25, 30, 35) # Adding extreme wind speeds
+# Add some missing values
+day$temp[c(5, 15)] <- NA
+day$hum[c(10, 20)] <- NA
+day$windspeed[c(30, 40)] <- NA
+# View the first few rows of the dataset
+print(head(day))
+print(sum(is.na(day)))
+boxplot(day[, c("temp", "hum", "windspeed")], main = "Boxplots of Raw Data")
+# Handle outliers in specific columns
+for(i in c("hum", "windspeed")) {
+ data <- unlist(day[i])
+ outliers <- boxplot.stats(data)$out
+ data[data %in% outliers] <- NA
+ day[i] <- data
+}
+# Check for missing values after handling outliers
+print(sum(is.na(day)))
+# Drop rows with missing values
+day_clean <- drop_na(day)
+boxplot(day_clean[, c("temp", "hum", "windspeed")], main = "Boxplots of Cleaned
+Data")
+----------------------------------------------------------------------------
+5. Perform analytics on any standard data set
+library(tidyverse)
+head(titanic)
+sapply(titanic, class)
+titanic$Sex = as.factor(titanic$Sex)
+titanic$Survived = as.factor(titanic$Survived)
+summary(titanic)
+dropnull_titanic = titanic[rowSums(is.na(titanic)) <= 0, ]
+survivedList = dropnull_titanic[dropnull_titanic$Survived == 1 , ]
+notSurvivedList = dropnull_titanic[dropnull_titanic$Survived == 0, ]
+mytable <- table(titanic$Survived)
+lbls <- paste(names(titanic), "\n", mytable, sep = "")
+pie(
+ mytable, 
+ labels = lbls,
+ main = "pie chart"
+)
+hist(titanic$Age, xlab = "gender", ylab = "frequency")
+barplot(table(notSurvivedList$Sex), xlab = "gender", ylab = "frequency")
+temp <- density(table(survivedList$Fare))
+plot(temp, type = "n", main = "fare charged")
+polygon(temp, col = "lightgray", border = "gray")
+boxplot(titanic$Fare, main = "fare")
+----------------------------------------------------------------------------------
+6. Implement linear regression
+library(caTools)
+library(ggplot2)
+# Create the data frame
+data <- data.frame(
+ Years_Exp = c(1.1, 1.3, 1.5, 2.0, 2.2, 2.9, 3.0, 3.2, 3.2, 3.7),
+ Salary = c(39343.00, 46205.00, 37731.00, 43525.00,
+ 39891.00, 56642.00, 60150.00, 54445.00, 64445.00, 57189.00)
+)
+# Split the data into training and testing sets
+set.seed(123) # Set seed for reproducibility
+split = sample.split(data$Salary, SplitRatio = 0.7)
+train = subset(data, split == TRUE)
+test = subset(data, split == FALSE)
+# Fit the linear model
+lm.r = lm(formula = Salary ~ Years_Exp, data = train)
+# Print the coefficients
+print(coef(lm.r))
+# Create the ggplot
+ggplot() + 
+ geom_point(aes(x = train$Years_Exp, y = train$Salary), col = 'red') + 
+ geom_line(aes(x = train$Years_Exp, y = predict(lm.r, newdata = train)), col = "blue") 
++ ggtitle("Salary vs Experience") + 
+ xlab("Years of Experience") + 
+ ylab("Salary")
+----------------------------------------------------------------------------------
+library(tidyverse)
+library(ROCR)
+library(caTools)
+library(ggplot2)
+# View the mtcars dataset
+view(mtcars)
+# Split the data into training and testing sets
+split <- sample.split(mtcars$vs, SplitRatio = 0.8) # Ensure using 'vs' for splitting
+train <- subset(mtcars, split == TRUE) # Use TRUE without quotes
+test <- subset(mtcars, split == FALSE) # Use FALSE without quotes
+# Build the logistic regression model
+logistic_model <- glm(vs ~ wt + disp, data = train, family = binomial)
+summary(logistic_model)
+# Make predictions
+predict_reg <- predict(logistic_model, test, type = "response")
+# Convert probabilities to binary outcomes
+predict_reg <- ifelse(predict_reg > 0.5, 1, 0)
+# Create a confusion matrix
+confusion_matrix <- table(test$vs, predict_reg)
+print(confusion_matrix)
+# Calculate and print classification error and accuracy
+missing_classerr <- mean(predict_reg != test$vs)
+print(paste("Classification Error = ", missing_classerr))
+print(paste("Accuracy = ", (1 - missing_classerr)))
+# Plot logistic regression curve
+ggplot(train, aes(x = wt + disp, y = vs)) + 
+ geom_point(alpha = .5) +
+ stat_smooth(method = "glm", se = FALSE, method.args = list(family = binomial), col = 
+"red") +
+ labs(title = "Logistic Regression Curve", x = "Weight + Displacement", y = "VS")
+16
+# ROC Curve
+ROCPred = prediction(predict_reg, test$vs)
+ROCPer = performance(ROCPred, measure = "tpr", x.measure = "fpr")
+auc <- performance(ROCPred, measure = "auc")
+auc_value <- auc@y.values[[1]]
+auc_value <- round(auc_value, 4)
+# Plot ROC Curve
+plot(ROCPer, colorize = TRUE, print.cutoffs.at = seq(0.1, by = 0.1), main = "ROC 
+Curve")
+abline(a = 0, b = 1)
+legend(0.6, 0.4, paste("AUC =", auc_value), title = "AUC", cex = 1)
+------------------------------------------------------------------------------
+8. Construct decision tree for weather data set
+sample = sample(c(TRUE, FALSE), nrow(weatherdata), replace = TRUE, prob = c
+(0.8, 0.2))
+train <- weatherdata[sample, ]
+test <- weatherdata[!sample, ]
+library(partykit)
+model <- ctree(RainTomorrow ~ ., train)
+plot(model)
+predict_model <- predict(model, test)
+predict_model 
+mat <- table(test$RainTomorrow, predict_model)
+mat
+accuracy <- sum(diag(mat)) / sum(mat)
+accuracy
+Output:
+ predict_mode
+-----------------------------------------------------------------------------
+9. Analyse time-series data
+positiveCases <- c(580, 7813, 28266, 59287,75700, 87820, 95314, 126214,
+218843, 471497, 936851,1508725, 2072113)
+deaths <- c(17, 270, 565, 1261, 2126, 2800,
+ 3285, 4628, 8951, 21283, 47210,
+ 88480, 138475)
+library(lubridate)
+# output to be created as png file
+png(file="multivariateTimeSeries.png")
+# creating multivariate time series object
+# from date 22 January, 2020
+mts <- ts(cbind(positiveCases, deaths),
+ start = decimal_date(ymd("2020-01-22")),
+ frequency = 365.25 / 7)
+# plotting the graph
+plot(mts, xlab ="Weekly Data",
+ main ="COVID-19 Cases",
+ col.main ="darkgreen")
+library(forecast)
+library(lubridate)
+png(file = "timeseries.png")
+mts1 <- ts(positiveCases, decimal_date(ymd("2020-01-22")), frequency = 
+365.25/7)
+fit <- auto.arima(mts1)
+fit <- forecast(fit, 5)
+19
+plot(forecast(fit, 5), xlab="weekly data", ylab = "positive cases", main = "COVID 
+19", col.main = "green")
+dev.off()
+------------------------------------------------------------------------------
+10. Work on any data visualization tool
+view(airquality)
+barplot(airquality$Ozone, 
+ main = 'Ozone Concenteration in air', 
+ xlab = 'ozone levels', horiz = TRUE) 
+hist(airquality$Temp, main ="La Guardia Airport's\
+Maximum Temperature(Daily)", 
+ xlab ="Temperature(Fahrenheit)", 
+ xlim = c(50, 125), col ="yellow", 
+ freq = TRUE) 
+boxplot(airquality[, 0:4], 
+ main ='Box Plots for Air Quality Parameters') 
+plot(airquality$Ozone, airquality$Month, 
+ main ="Scatterplot Example", 
+ xlab ="Ozone Concentration in parts per billion", 
+ ylab =" Month of observation ", pch = 19) 
+data <- matrix(rnorm(50, 0, 5), nrow = 5, ncol = 5) 
+# Column names 
+colnames(data) <- paste0("col", 1:5) 
+rownames(data) <- paste0("row", 1:5) 
+# Draw a heatmap 
+heatmap(data)
